@@ -12,6 +12,11 @@ Judge-criteria mapping (weighed in this order):
   3. tight - every word earns its place, nothing to trim
   4. fresh - a reference letter to apply for my job is no stock pun
   5. memorable - the "my job" callback is the line people repeat
+
+Verified artifact: 102 characters, 21 words, one line, no trailing
+newline. main() reads the file back and asserts the written bytes are
+exactly JOKE, so a silent truncation or newline change fails loudly
+instead of submitting a different line than the one reviewed here.
 """
 import os
 
@@ -27,8 +32,12 @@ def main() -> None:
     assert "\n" not in JOKE, "joke must be a single line"
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
-    with open(os.path.join(out_dir, "entry.txt"), "w", encoding="utf-8") as f:
+    path = os.path.join(out_dir, "entry.txt")
+    with open(path, "w", encoding="utf-8") as f:
         f.write(JOKE)
+    with open(path, "rb") as f:
+        written = f.read()
+    assert written == JOKE.encode("utf-8"), "entry.txt must match JOKE exactly"
     print(JOKE)
 
 
